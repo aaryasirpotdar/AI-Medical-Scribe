@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medical Scribe</title>
+</head>
+<body>
+
+<h1>AI Medical Voice Documentation System</h1>
+
+<h3>Upload Audio</h3>
+
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="audio">
+    <button type="submit">Upload</button>
+</form>
+
+<hr>
+
+<h3>Record Audio</h3>
+
+<button id="startBtn">🎤 Start Recording</button>
+<button id="stopBtn" disabled>🛑 Stop Recording</button>
+
+<p id="status">Ready</p>
+
+<script>
+
+let mediaRecorder;
+let audioChunks = [];
+
+document.getElementById("startBtn").onclick = async () => {
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+    });
+
+    mediaRecorder = new MediaRecorder(stream);
+
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+    };
+
+    mediaRecorder.start();
+
+    document.getElementById("status").innerText =
+        "Recording...";
+
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("stopBtn").disabled = false;
+};
+
+document.getElementById("stopBtn").onclick = () => {
+
+    mediaRecorder.stop();
+
+    document.getElementById("status").innerText =
+        "Recording stopped.";
+
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("stopBtn").disabled = true;
+};
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Consultation Report</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 40px;
+        }
+
+        .report-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        hr {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="report-container">
+
+    <h1>Patient Consultation Summary</h1>
+
+    <hr>
+
+    <div class="section">
+        <span class="label">Symptoms:</span>
+        <p>{{data["Symptoms"] }}</p>
+    </div>
+
+    <div class="section">
+        <span class="label">Duration:</span>
+        <p>{{data["Duration"]}}</p>
+    </div>
+
+    <div class="section">
+        <span class="label">BP:</span>
+        <p>{{data["BP"] }}</p>
+    </div>
+
+    <div class="section">
+        <span class="label">Medical History:</span>
+        <p>{{data["Medical History"]}}</p>
+    </div>
+
+    <div class="section">
+        <span class="label">Medicines:</span>
+        <p>{{data["Medicines"] }}</p>
+    </div>
+
+    <div class="section">
+        <span class="label">Tests Advised:</span>
+        <p>{{ data["Tests"]}}</p>
+    </div>
+
+    <div style="text-align:center; margin-top:30px;">
+
+    <a href="/download-pdf">
+        <button style="
+            padding:12px 25px;
+            font-size:16px;
+            cursor:pointer;
+            border:none;
+            border-radius:6px;
+        ">
+            Download PDF
+        </button>
+    </a>
+
+</div>
+
+</div>
+
+</body>
+</html>

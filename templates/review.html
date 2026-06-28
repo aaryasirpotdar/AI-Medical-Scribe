@@ -1,0 +1,73 @@
+<form action="/save" method="POST">
+
+    Patient Name:
+    <input type="text" name="patient_name">
+
+    <br><br>
+
+    Age:
+    <input type="number" name="age">
+
+    <br><br>
+
+    Gender:
+    <select name="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <br><br>
+
+    Phone:
+    <input type="text" name="phone">
+
+    <br><br>
+
+    Symptoms:
+    <input type="text"
+           name="symptoms"
+           value="{{ data['Symptoms'] }}">
+
+    <br><br>
+
+    Duration:
+    <input type="text"
+           name="duration"
+           value="{{ data['Duration'] }}">
+
+    <br><br>
+
+    BP:
+    <input type="text"
+           name="bp"
+           value="{{ data['BP'] }}">
+
+    <br><br>
+
+    Medical History:
+    <input type="text"
+           name="medical_history"
+           value="{{ data['Medical History'] }}">
+
+    <br><br>
+
+    Medicines:
+    <input type="text"
+           name="medicines"
+           value="{{ data['Medicines'] }}">
+
+    <br><br>
+
+    Tests:
+    <input type="text"
+           name="tests"
+           value="{{ data['Tests'] }}">
+
+    <br><br>
+
+    <button type="submit">
+        Save & Generate Report
+    </button>
+
+</form>

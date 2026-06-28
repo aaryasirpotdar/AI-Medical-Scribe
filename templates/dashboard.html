@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <style>
+        body{
+            font-family: Arial;
+            padding:40px;
+            background:#f4f6f9;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+        }
+
+        th,td{
+            border:1px solid #ddd;
+            padding:12px;
+            text-align:left;
+        }
+
+        th{
+            background:#2c3e50;
+            color:white;
+        }
+
+        h1{
+            text-align:center;
+        }
+    </style>
+</head>
+
+<body>
+
+<form method="GET" action="/dashboard">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search Patient Name"
+        value="{{ search }}">
+
+    <button type="submit">
+        Search
+    </button>
+
+    <a href="/dashboard">
+        <button type="button">
+            Show All
+        </button>
+    </a>
+
+</form>
+
+<br>
+
+<h1>Patient Dashboard</h1>
+
+<table>
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Age</th>
+    <th>Gender</th>
+    <th>Phone</th>
+    <th>Symptoms</th>
+    <th>Duration</th>
+    <th>BP</th>
+</tr>
+
+{% for patient in patients %}
+
+<tr>
+    <td>{{ patient[0] }}</td>
+    <td>{{ patient[1] }}</td>
+    <td>{{ patient[2] }}</td>
+    <td>{{ patient[3] }}</td>
+    <td>{{ patient[4] }}</td>
+    <td>{{ patient[5] }}</td>
+    <td>{{ patient[6] }}</td>
+    <td>{{ patient[7] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

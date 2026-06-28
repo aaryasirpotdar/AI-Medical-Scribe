@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Environment Variables
+.env
+
+# Database
+*.db
+database/*.db
+
+# Generated Reports
+*.pdf
+report.txt
+reports/
+
+# Uploaded Audio
+uploads/
+recordings/
+*.wav
+*.mp3
+
+# VS Code
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
