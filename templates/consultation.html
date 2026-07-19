@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Medical Scribe</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/consultation.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+
+        <h1>🏥 AI Medical Scribe</h1>
+
+        <p>Doctor Consultation Assistant</p>
+
+    </header>
+
+    <!-- Patient Details -->
+
+    <div class="patient-card">
+
+        <h2>Patient Details</h2>
+
+        <div class="patient-grid">
+
+            <input
+                type="text"
+                id="patientName"
+                placeholder="Patient Name">
+
+            <input
+                type="number"
+                id="patientAge"
+                placeholder="Age">
+
+            <select id="patientGender">
+
+                <option value="">Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <!-- Categories -->
+
+    <div id="categoryContainer">
+
+        <!-- JavaScript will create cards here -->
+
+    </div>
+
+    <div class="generate-section">
+
+        <button id="generateBtn">
+
+            📄 Generate Report
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/consultation.js') }}"></script>
+
+</body>
+
+</html>
