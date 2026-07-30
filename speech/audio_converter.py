@@ -11,8 +11,9 @@ def convert_to_wav(input_path):
         "-y",
         "-i", input_path,
         "-ac", "1",          # Mono
-        "-ar", "16000",      # 16 kHz
+        "-ar", "16000",      # MedASR's expected sample rate
         "-sample_fmt", "s16",
+        "-af", "highpass=f=80",  # Remove handling/room rumble
         output_path
     ]
 

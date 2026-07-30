@@ -3,8 +3,10 @@ from flask import (
     render_template,
     request,
     jsonify,
-    send_file
+    send_file,
+    abort
 )
+from werkzeug.utils import secure_filename
 
 import os
 import uuid
@@ -19,7 +21,7 @@ from database.db import (
 )
 
 from speech.medasr_engine import transcribe_audio
-from ai.gemini_extractor import extract_medical_info
+from ai.gemini_extractor import correct_medical_transcript, split_medical_transcript
 
 from reports.pdf_generator import generate_pdf
 
@@ -45,8 +47,14 @@ def home():
 @app.route("/record", methods=["POST"])
 def record():
 
-    audio = request.files["audio"]
-    category = request.form["category"]
+    audio = request.files.get("audio")
+    category = request.form.get("category", "")
+
+    if audio is None or not audio.filename:
+        return jsonify({"error": "An audio recording is required."}), 400
+
+    if not category:
+        return jsonify({"error": "A consultation category is required."}), 400
 
     with tempfile.NamedTemporaryFile(
         suffix=".webm",
@@ -55,19 +63,22 @@ def record():
 
         audio.save(temp.name)
 
-        wav_path = convert_to_wav(temp.name)
-
-        transcript = transcribe_audio(wav_path)
-        print("=" * 50)
-        print("RAW MEDASR TRANSCRIPT")
-        print(transcript)
-        print("=" * 50)
-
-    try:
-        os.remove(temp.name)
-        os.remove(wav_path)
-    except OSError:
-        pass
+        wav_path = None
+        try:
+            wav_path = convert_to_wav(temp.name)
+            transcript = transcribe_audio(wav_path)
+            transcript = correct_medical_transcript(transcript, category)
+            transcript = split_medical_transcript(transcript, category)
+        except Exception:
+            app.logger.exception("Medical transcription failed")
+            return jsonify({"error": "Unable to transcribe this recording."}), 500
+        finally:
+            for path in (temp.name, wav_path):
+                if path:
+                    try:
+                        os.remove(path)
+                    except OSError:
+                        pass
 
     return jsonify({
 
@@ -89,6 +100,7 @@ def generate():
         "Symptoms": [],
         "Duration": [],
         "BP": [],
+        "Allergies": [],
         "Medical History": [],
         "Medicines": [],
         "Tests": [],
@@ -97,7 +109,10 @@ def generate():
     }
 
     for entry in consultation["entries"]:
-        grouped[entry["category"]].append(entry["text"])
+        category = entry.get("category")
+        text = entry.get("text", "").strip()
+        if category in grouped and text:
+            grouped[category].append(text)
 
     # Convert list -> string
     for key in grouped:
@@ -107,9 +122,6 @@ def generate():
     grouped["Age"] = consultation["age"]
     grouped["Gender"] = consultation["gender"]
     grouped["Phone"] = consultation.get("phone", "")
-
-    # Optional Gemini refinement
-    grouped = extract_medical_info(grouped)
 
     return render_template(
         "review.html",
@@ -133,9 +145,12 @@ def save():
         "Symptoms": request.form.get("symptoms", ""),
         "Duration": request.form.get("duration", ""),
         "BP": request.form.get("bp", ""),
+        "Allergies": request.form.get("allergies", ""),
         "Medical History": request.form.get("medical_history", ""),
         "Medicines": request.form.get("medicines", ""),
-        "Tests": request.form.get("tests", "")
+        "Tests": request.form.get("tests", ""),
+        "Diagnosis": request.form.get("diagnosis", ""),
+        "Examination": request.form.get("examination", "")
 
     }
 
@@ -146,11 +161,16 @@ def save():
 
     save_patient(data)
 
-    generate_pdf(data)
+    safe_name = secure_filename(patient_name.strip()) or "patient"
+    pdf_filename = f"{safe_name}.pdf"
+    pdf_path = os.path.join("reports", pdf_filename)
+    os.makedirs("reports", exist_ok=True)
+    generate_pdf(data, pdf_path)
 
     return render_template(
         "report.html",
-        data=data
+        data=data,
+        pdf_filename=pdf_filename
     )
 
 
@@ -160,8 +180,16 @@ def save():
 @app.route("/download-pdf")
 def download_pdf():
 
+    filename = secure_filename(request.args.get("filename", ""))
+    if not filename or not filename.lower().endswith(".pdf"):
+        abort(404)
+
+    pdf_path = os.path.join("reports", filename)
+    if not os.path.isfile(pdf_path):
+        abort(404)
+
     return send_file(
-        "patient_report.pdf",
+        pdf_path,
         as_attachment=True
     )
 

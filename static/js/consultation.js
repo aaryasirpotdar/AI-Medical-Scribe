@@ -89,7 +89,12 @@ document.querySelectorAll(".recordBtn").forEach(button => {
 
                 const stream =
                     await navigator.mediaDevices.getUserMedia({
-                        audio: true
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true,
+                            channelCount: 1
+                        }
                     });
 
                 mediaRecorder =
@@ -180,23 +185,37 @@ async function uploadAudio() {
 
         });
 
-        const data = await response.json();
+        const responseText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch {
+            throw new Error(
+                response.ok
+                    ? "The server returned an invalid transcription response."
+                    : `The server failed while processing the recording (HTTP ${response.status}).`
+            );
+        }
 
-        consultationEntries.push({
+        if (!response.ok) {
+            throw new Error(data.error || "Transcription failed");
+        }
 
-            category: data.category,
+        // The verified transcript is normally a single entry. Keep support for
+        // line breaks in case a future transcription source supplies them.
+        const entries = data.transcript
+            .split(/\r?\n/)
+            .map(text => text.trim())
+            .filter(Boolean);
 
-            text: data.transcript
+        entries.forEach(text => {
+            consultationEntries.push({
+                category: data.category,
+                text
+            });
 
+            displayEntry(data.category, text);
         });
-
-        displayEntry(
-
-            data.category,
-
-            data.transcript
-
-        );
 
     }
 
@@ -204,7 +223,7 @@ async function uploadAudio() {
 
         console.error(err);
 
-        alert("Upload Failed");
+        alert(err.message || "Upload Failed");
 
     }
 

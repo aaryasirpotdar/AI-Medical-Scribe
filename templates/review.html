@@ -1,73 +1,51 @@
-<form action="/save" method="POST">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Consultation</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 32px 16px; color: #1f2937; }
+        main { max-width: 900px; margin: auto; background: #fff; padding: 32px; border-radius: 12px; box-shadow: 0 4px 18px #00000018; }
+        h1 { margin-top: 0; } .hint { color: #4b5563; margin-bottom: 28px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .field { margin: 18px 0; } label { display: block; font-weight: 700; margin-bottom: 7px; }
+        input, select, textarea { box-sizing: border-box; width: 100%; border: 1px solid #cbd5e1; border-radius: 7px; padding: 10px; font: inherit; }
+        textarea { min-height: 82px; resize: vertical; white-space: pre-wrap; }
+        h2 { margin-top: 30px; font-size: 1.15rem; } button { background: #2563eb; color: #fff; border: 0; border-radius: 7px; padding: 13px 20px; font-size: 1rem; cursor: pointer; }
+        button:hover { background: #1d4ed8; } @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } main { padding: 22px; } }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Review Consultation</h1>
+    <p class="hint">Verify every spelling and clinical detail before confirming. The PDF is generated only after confirmation.</p>
 
-    Patient Name:
-    <input type="text" name="patient_name">
+    <form action="{{ url_for('save') }}" method="POST">
+        <h2>Patient details</h2>
+        <div class="grid">
+            <div class="field"><label for="patient_name">Patient name</label><input id="patient_name" type="text" name="patient_name" value="{{ data['Patient Name'] }}" required></div>
+            <div class="field"><label for="age">Age</label><input id="age" type="number" name="age" value="{{ data['Age'] }}"></div>
+            <div class="field"><label for="gender">Gender</label><select id="gender" name="gender"><option value="">Select</option><option value="Male" {% if data['Gender'] == 'Male' %}selected{% endif %}>Male</option><option value="Female" {% if data['Gender'] == 'Female' %}selected{% endif %}>Female</option><option value="Other" {% if data['Gender'] == 'Other' %}selected{% endif %}>Other</option></select></div>
+        </div>
+        <div class="field"><label for="phone">Phone</label><input id="phone" type="text" name="phone" value="{{ data['Phone'] }}"></div>
 
-    <br><br>
+        <h2>Clinical details</h2>
+        {% set fields = [
+            ('Symptoms', 'symptoms'), ('Duration', 'duration'), ('BP', 'bp'),
+            ('Allergies', 'allergies'), ('Medical History', 'medical_history'),
+            ('Examination', 'examination'), ('Diagnosis', 'diagnosis'),
+            ('Medicines', 'medicines'), ('Tests', 'tests')
+        ] %}
+        {% for label, name in fields %}
+        <div class="field">
+            <label for="{{ name }}">{{ label }}</label>
+            <textarea id="{{ name }}" name="{{ name }}">{{ data[label] }}</textarea>
+        </div>
+        {% endfor %}
 
-    Age:
-    <input type="number" name="age">
-
-    <br><br>
-
-    Gender:
-    <select name="gender">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-    </select>
-
-    <br><br>
-
-    Phone:
-    <input type="text" name="phone">
-
-    <br><br>
-
-    Symptoms:
-    <input type="text"
-           name="symptoms"
-           value="{{ data['Symptoms'] }}">
-
-    <br><br>
-
-    Duration:
-    <input type="text"
-           name="duration"
-           value="{{ data['Duration'] }}">
-
-    <br><br>
-
-    BP:
-    <input type="text"
-           name="bp"
-           value="{{ data['BP'] }}">
-
-    <br><br>
-
-    Medical History:
-    <input type="text"
-           name="medical_history"
-           value="{{ data['Medical History'] }}">
-
-    <br><br>
-
-    Medicines:
-    <input type="text"
-           name="medicines"
-           value="{{ data['Medicines'] }}">
-
-    <br><br>
-
-    Tests:
-    <input type="text"
-           name="tests"
-           value="{{ data['Tests'] }}">
-
-    <br><br>
-
-    <button type="submit">
-        Save & Generate Report
-    </button>
-
-</form>
+        <button type="submit">Confirm details &amp; generate PDF</button>
+    </form>
+</main>
+</body>
+</html>
