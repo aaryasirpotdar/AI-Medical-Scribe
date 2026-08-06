@@ -1,3 +1,4 @@
+from database.models import db, Patient, Consultation
 import sqlite3
 
 DB_NAME = "database/patients.db"
@@ -27,38 +28,32 @@ def create_table():
     conn.commit()
     conn.close()
 
+    
 def save_patient(data):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("""
-INSERT INTO patients (
-    patient_name,
-    age,
-    gender,
-    phone,
-    symptoms,
-    duration,
-    bp,
-    history,
-    medicines,
-    tests
-)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-""", (
-    data["Patient Name"],
-    data["Age"],
-    data["Gender"],
-    data["Phone"],
-    data["Symptoms"],
-    data["Duration"],
-    data["BP"],
-    data["Medical History"],
-    data["Medicines"],
-    data["Tests"]
-))
 
-    conn.commit()
-    conn.close()
+    patient = Patient(
+        patient_name=data["Patient Name"],
+        age=data["Age"],
+        gender=data["Gender"],
+        phone=data["Phone"]
+    )
+
+    db.session.add(patient)
+    db.session.commit()
+
+    consultation = Consultation(
+        patient_id=patient.id,
+        symptoms=data["Symptoms"],
+        duration=data["Duration"],
+        bp=data["BP"],
+        history=data["Medical History"],
+        medicines=data["Medicines"],
+        tests=data["Tests"]
+    )
+
+    db.session.add(consultation)
+    db.session.commit()
+
     
 def get_latest_patient():
     conn = sqlite3.connect(DB_NAME)

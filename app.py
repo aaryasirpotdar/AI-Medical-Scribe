@@ -1,3 +1,5 @@
+from config import Config
+from database.database import db
 from flask import (
     Flask,
     render_template,
@@ -15,10 +17,11 @@ from speech.audio_converter import convert_to_wav
 
 from database.db import (
     create_table,
-    save_patient,
     get_all_patients,
     search_patients
 )
+
+from database.repository import save_patient
 
 from speech.medasr_engine import transcribe_audio
 from ai.gemini_extractor import correct_medical_transcript, split_medical_transcript
@@ -27,7 +30,14 @@ from reports.pdf_generator import generate_pdf
 
 app = Flask(__name__)
 
-create_table()
+app.config.from_object(Config)
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
+#create_table()
 
 UPLOAD_FOLDER = "uploads/consultation_audio"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
